@@ -7,10 +7,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["clf", "common log format"],
+  "keywords": [
+    "clf",
+    "common log format"
+  ],
   "author": "Hugo Mendes",
   "license": "ISC",
   "dependencies": {
+    "clf-parser": "0.0.2",
+    "tail": "^1.2.3",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
