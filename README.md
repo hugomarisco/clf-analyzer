@@ -10,9 +10,9 @@ Options:
   --help                   Show help                                   [boolean]
   --version                Show version number                         [boolean]
   --path, -p               The path of the logfile to monitor[string] [required]
-  --treshold-interval, -i  The window (in minutes) to watch for the request
+  --threshold-interval, -i  The window (in minutes) to watch for the request
                            count for alerting              [number] [default: 2]
-  --treshold-count, -c     The number of requests that trigger the alerting
+  --threshold-count, -c     The number of requests that trigger the alerting
                                                          [number] [default: 200]
 
 Examples:
