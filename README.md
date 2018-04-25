@@ -3,6 +3,16 @@
 # clf-analyzer
 A simple Common Log Format analyzer
 
+# Run application
+
+- Run from source:
+
+`node index.js --help`
+
+- Run using **npx**:
+
+`npx clf-analyzer --help`
+
 # Usage
 
 ```
@@ -18,12 +28,6 @@ Options:
                         for alerting                       [number] [default: 2]
   --threshold-count     The number of requests that trigger the alerting
                                                          [number] [default: 200]
-
-Examples:
-  clf-analyzer --threshold-interval 4       Monitor common.log file for changes
-  --threshold-count 10 --path common.log    and alert when the number of
-                                            requests for the past 4 minutes is
-                                            more than 10
 ```
 
 # Testing
