@@ -1,4 +1,5 @@
 const { Tail } = require('tail')
+const chalk = require('chalk')
 const buildReport = require('./lib/reporting')
 const checkThreshold = require('./lib/alerting')
 
@@ -27,12 +28,14 @@ logFileStream.on('line', (logLine) => {
 
 // build and print a report every <reportingInterval> seconds
 setInterval(() => {
+  console.log(chalk.bold.underline(`\n\nR E P O R T | ${(new Date()).toUTCString()}`))
+
   Object.entries(buildReport(logBuffer)) // build a report based on the log buffer
     // Sort each metric on a descending order in terms of hits
     .map(([key, value]) => [ key, Object.entries(value).sort(([key1, value1], [key2, value2]) => value2 - value1) ])
     // print the results to the console
     .forEach(([key, values]) => {
-      console.log(`\n${key} stats:`)
+      console.log(chalk.bold(`\n${key} statistics:`))
 
       values
         .slice(0, key === 'sections' ? reportingLimit : values.length) // truncate the section metrics
@@ -54,8 +57,8 @@ setInterval(() => {
 
     console.log(
       shouldAlert
-        ? `Alert triggered - ${updatedRequestTimestamps.length} hits on ${dateString}`
-        : `Alert cleared on ${dateString}`
+        ? chalk.red(`Alert triggered - ${updatedRequestTimestamps.length} hits on ${dateString}`)
+        : chalk.green(`Alert cleared on ${dateString}`)
     )
 
     // update the alert flag
