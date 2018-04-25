@@ -1,23 +1,33 @@
 const { Tail } = require('tail')
-const logParser = require('./lib/log-parser')
+const buildReport = require('./lib/reporting')
+const checkThreshold = require('./lib/alerting')
 
 // parse the cli arguments
-const { path: logfilePath, interval: reportingInterval, limit: reportingLimit } = require('./lib/argv')
+const {
+  path: logfilePath,
+  interval: reportingInterval,
+  limit: reportingLimit,
+  thresholdInterval,
+  thresholdCount
+} = require('./lib/argv')
 
-let logBuffer = [] // initialize an array so we can store the loglines for reporting
+let logBuffer = [] // buffer to store logs for reporting
 
-const logfileStream = new Tail(logfilePath) // tail the logfile
+let requestTimestamps = [] // requests' timestamps
 
-logfileStream.on('line', (logLine) => logBuffer.push(logLine)) // store each logline in the buffer
+let isAlerting = false // alert flag
 
+const logFileStream = new Tail(logfilePath) // tail the logfile
+
+logFileStream.on('line', (logLine) => {
+  requestTimestamps.push(Date.now()) // store timestamp to monitor threshold
+
+  logBuffer.push(logLine) // store each logline in the buffer
+})
+
+// build and print a report every <reportingInterval> seconds
 setInterval(() => {
-  const lastLogBuffer = logBuffer // store a reference to the current buffer
-
-  logBuffer = [] // assign an empty array so new loglines don't end up in the old array
-
-  const report = logParser(lastLogBuffer) // parse the log and build an object with the counters
-
-  Object.entries(report)
+  Object.entries(buildReport(logBuffer)) // build a report based on the log buffer
     // Sort each metric on a descending order in terms of hits
     .map(([key, value]) => [ key, Object.entries(value).sort(([key1, value1], [key2, value2]) => value2 - value1) ])
     // print the results to the console
@@ -28,4 +38,30 @@ setInterval(() => {
         .slice(0, key === 'sections' ? reportingLimit : values.length) // truncate the section metrics
         .forEach(([key, value]) => console.log(`${key}: ${value}`))
     })
-}, reportingInterval * 1000) // build and print a report every <reportingInterval> seconds
+
+  logBuffer = [] // empty the buffer
+}, reportingInterval * 1000)
+
+setInterval(() => {
+  const {
+    shouldAlert,
+    updatedRequestTimestamps
+  } = checkThreshold({ requestTimestamps, logFileStream, thresholdInterval, thresholdCount })
+
+  // if there's an update on the alerting status
+  if (shouldAlert !== isAlerting) {
+    const dateString = (new Date()).toUTCString()
+
+    console.log(
+      shouldAlert
+        ? `Alert triggered - ${updatedRequestTimestamps.length} hits on ${dateString}`
+        : `Alert cleared on ${dateString}`
+    )
+
+    // update the alert flag
+    isAlerting = shouldAlert
+  }
+
+  // update the timestamps array
+  requestTimestamps = updatedRequestTimestamps
+}, 1000)
