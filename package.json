@@ -1,9 +1,10 @@
 {
   "name": "clf-analyzer",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A simple Common Log Format analyzer",
   "repository": "https://github.com/hugomarisco/clf-analyzer",
   "main": "index.js",
+  "bin": "./index.js",
   "scripts": {
     "test": "nyc mocha --recursive"
   },
