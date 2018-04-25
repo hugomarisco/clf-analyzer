@@ -4,6 +4,7 @@
   "description": "A simple Common Log Format analyzer",
   "repository": "https://github.com/hugomarisco/clf-analyzer",
   "main": "index.js",
+  "bin": "./index.js",
   "scripts": {
     "test": "nyc mocha --recursive"
   },

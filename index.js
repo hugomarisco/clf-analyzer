@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const { Tail } = require('tail')
 const chalk = require('chalk')
 const buildReport = require('./lib/reporting')
